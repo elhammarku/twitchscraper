@@ -47,13 +47,67 @@ def safe_get(url, headers, params=None):
 # ====================
 # Twitch API Functions
 # ====================
-# (Functions remain unchanged)
 
-# ... [keep all existing functions here unchanged] ...
+def get_user_info(headers, username):
+    url = f"{BASE_URL}/users"
+    params = {"login": username}
+    data = safe_get(url, headers, params)
+    if data and data.get("data"):
+        return data["data"][0]
+    return {}
+
+
+def get_followers_count(headers, user_id):
+    url = f"{BASE_URL}/users/follows"
+    params = {"to_id": user_id}
+    data = safe_get(url, headers, params)
+    return data.get("total", 0) if data else 0
+
+
+def get_followed_channels(headers, user_id):
+    url = f"{BASE_URL}/users/follows"
+    params = {"from_id": user_id, "first": 100}
+    data = safe_get(url, headers, params)
+    return data.get("data", []) if data else []
+
+
+def get_stream(headers, user_id):
+    url = f"{BASE_URL}/streams"
+    params = {"user_id": user_id}
+    data = safe_get(url, headers, params)
+    if data and data.get("data"):
+        return data["data"][0]
+    return None
+
+
+def get_videos(headers, user_id):
+    url = f"{BASE_URL}/videos"
+    params = {"user_id": user_id, "first": 100}
+    data = safe_get(url, headers, params)
+    return data.get("data", []) if data else []
+
+
+def get_clips(headers, user_id):
+    url = f"{BASE_URL}/clips"
+    params = {"broadcaster_id": user_id, "first": 100}
+    data = safe_get(url, headers, params)
+    return data.get("data", []) if data else []
+
+
+def get_game_name(headers, game_id):
+    if not game_id:
+        return ""
+    url = f"{BASE_URL}/games"
+    params = {"id": game_id}
+    data = safe_get(url, headers, params)
+    if data and data.get("data"):
+        return data["data"][0].get("name", "")
+    return ""
 
 # ====================
 # Main Function
 # ====================
+
 def main():
     if not CLIENT_ID or not CLIENT_SECRET:
         print("[ERROR] CLIENT_ID and CLIENT_SECRET must be set in environment (.env).")
