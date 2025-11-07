@@ -2,27 +2,27 @@ pipeline {
     agent any
 
     environment {
-        PYTHON = 'python3'
+        PYTHON = 'python'
     }
 
     triggers {
-        // Schedule job to run once every 24 hours
+        // Run every 24 hours
         cron('H H * * *')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Pull the Twitch scraper code from source control
                 checkout scm
             }
         }
 
         stage('Set up Python environment') {
             steps {
-                sh '''
+                // Use Windows-friendly commands if Jenkins is running on Windows
+                bat '''
                 python -m venv venv
-                . venv/bin/activate
+                call venv\\Scripts\\activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -31,8 +31,8 @@ pipeline {
 
         stage('Run Twitch Scraper') {
             steps {
-                sh '''
-                . venv/bin/activate
+                bat '''
+                call venv\\Scripts\\activate
                 python twitch_scraper_fixed.py
                 '''
             }
