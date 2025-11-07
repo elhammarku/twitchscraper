@@ -24,7 +24,7 @@ pipeline {
                 python -m venv venv
                 call venv\\Scripts\\activate
                 pip install --upgrade pip
-                pip install -r requirements.txt
+                pip install -r requirements.txt || echo requirements.txt not found, skipping.
                 '''
             }
         }
@@ -32,6 +32,7 @@ pipeline {
         stage('Run Twitch Scraper') {
             steps {
                 bat '''
+                chcp 65001 >NUL
                 call venv\\Scripts\\activate
                 python twitch_scraper_fixed.py
                 '''
@@ -47,7 +48,7 @@ pipeline {
 
     post {
         failure {
-            mail to: 'your_email@example.com', subject: 'Twitch Scraper Job Failed', body: 'The Jenkins job for Twitch Scraper has failed. Please check logs.'
+            echo 'Job failed — skipping email notification because SMTP not configured.'
         }
     }
 }
